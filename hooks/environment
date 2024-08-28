@@ -52,18 +52,17 @@ function get_secret_value() {
   local secret_name="$1"
   local secret_version
   local secret_value
+  local project_arg
 
-  secret_version=$(gcloud secrets versions list "${secret_name}" --format=json | jq -r '.[0].name')
-  secret_version="${secret_version##*/}"
+  secret_version=latest
 
-  local result=$?
-  if [[ $result -ne 0 ]]; then
-    exit 1
+  if [ -v BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_PROJECT_ID ]; then
+    project_arg="--project=${BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_PROJECT_ID}"
   fi
 
   secret_value=$(gcloud secrets versions access "${secret_version}" \
-    --secret="${secret_name}" \
-    --format='get(payload.data)' | tr '_-' '/+' | base64 -d)
+    --secret="${secret_name}") \
+    ${project_arg}
 
   result=$?
   if [[ $result -ne 0 ]]; then
