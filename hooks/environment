@@ -61,8 +61,8 @@ function get_secret_value() {
   fi
 
   secret_value=$(gcloud secrets versions access "${secret_version}" \
-    --secret="${secret_name}") \
-    ${project_arg}
+    --secret="${secret_name}" \
+    ${project_arg})
 
   result=$?
   if [[ $result -ne 0 ]]; then
